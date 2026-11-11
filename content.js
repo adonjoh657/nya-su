@@ -17,7 +17,7 @@
   const WORD3 = /\p{L}{3,}/u;
   const CURRENCY_RE = /F\s?CFA|FCFA|XAF|XOF|CFA|EUR|USD/gi;
   const NAME_RE = /^[A-ZÀ-ÝŒ][\p{L}'’-]*(?:\s+[A-ZÀ-ÝŒ][\p{L}'’-]*)+$/u;
-  const SLOT_SPLIT = /⟦E([a-z])⟧/;
+  const SLOT_SPLIT = /\[\[E([a-z])\]\]/;
 
   const send = (msg) =>
     new Promise((resolve) => {
@@ -220,7 +220,7 @@
     return !WORD3.test(t.replace(CURRENCY_RE, ""));
   }
 
-  // Bloc « texte + éléments données » traduit comme une seule phrase : "Votre solde est ⟦Ea⟧".
+  // Bloc « texte + éléments données » traduit comme une seule phrase : "Votre solde est [[Ea]]".
   function buildComposite(el) {
     const nodes = Array.from(el.childNodes);
     const slots = [];
@@ -232,13 +232,13 @@
         if (n.nodeValue.trim()) hasText = true;
       } else if (n.nodeType === 1) {
         if (!INLINE_TAGS.has(n.localName.toUpperCase()) || !isSlot(n)) return null;
-        str += `⟦E${String.fromCharCode(97 + slots.length)}⟧`;
+        str += `[[E${String.fromCharCode(97 + slots.length)}]]`;
         slots.push(n);
       } else if (n.nodeType !== 8) {
         return null;
       }
     }
-    if (!hasText || !slots.length || !HAS_LETTER.test(str.replace(/⟦E[a-z]⟧/g, ""))) return null;
+    if (!hasText || !slots.length || !HAS_LETTER.test(str.replace(/\[\[E[a-z]\]\]/gi, "").replace(/⟦E[a-z]⟧/g, ""))) return null;
     return { str, slots, nodes };
   }
 
@@ -370,14 +370,17 @@
   // Reconstruit les enfants d'un bloc composite à partir de la phrase traduite.
   // Refuse le résultat si un élément « donnée » manque, est dupliqué ou inventé.
   function rebuild(translated, slots, lead, trail) {
-    const parts = translated.split(SLOT_SPLIT);
+    const normText = (translated || "")
+      .replace(/\[\[\s*E([a-z])\s*\]\]/gi, "[[E$1]]")
+      .replace(/⟦E([a-z])⟧/g, "[[E$1]]");
+    const parts = normText.split(SLOT_SPLIT);
     const out = [];
     const seen = new Set();
     for (let i = 0; i < parts.length; i++) {
       if (i % 2 === 0) {
         if (parts[i]) out.push(document.createTextNode(parts[i]));
       } else {
-        const idx = parts[i].charCodeAt(0) - 97;
+        const idx = parts[i].toLowerCase().charCodeAt(0) - 97;
         if (!slots[idx] || seen.has(idx)) return null;
         seen.add(idx);
         out.push(slots[idx]);
@@ -387,6 +390,10 @@
     if (lead) out.unshift(document.createTextNode(lead));
     if (trail) out.push(document.createTextNode(trail));
     return out;
+  }
+
+  function hasSlotLeak(text) {
+    return SLOT_SPLIT.test(text) || /⟦E[a-z]⟧/i.test(text);
   }
 
   function applyJob(job) {
@@ -405,7 +412,7 @@
     }
 
     if (job.kind === "text") {
-      if (!job.node.isConnected || job.node.nodeValue !== job.value || SLOT_SPLIT.test(r.text)) return;
+      if (!job.node.isConnected || job.node.nodeValue !== job.value || hasSlotLeak(r.text)) return;
       const lead = job.value.match(/^\s*/)[0];
       const trail = job.value.match(/\s*$/)[0];
       const nv = lead + r.text + trail;
@@ -414,7 +421,7 @@
       r.machine ? stats.machine++ : stats.dict++;
       if (r.machine) mark([job.node]);
     } else if (job.kind === "attr") {
-      if (!job.el.isConnected || job.el.getAttribute(job.attr) !== job.orig || SLOT_SPLIT.test(r.text)) return;
+      if (!job.el.isConnected || job.el.getAttribute(job.attr) !== job.orig || hasSlotLeak(r.text)) return;
       job.el.setAttribute(job.attr, r.text);
       const o = attrState.get(job.el) || {};
       o[job.attr] = { orig: job.orig, translated: r.text };

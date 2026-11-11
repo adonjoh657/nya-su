@@ -97,11 +97,16 @@ export async function translate(text, direction = "fr-ewo") {
   // 3. API de secours (uniquement si activée par l'utilisateur)
   if (cfg.apiEnabled && cfg.apiUrl) {
     try {
+      // Timeout de 8 secondes pour ne jamais bloquer la page si l'API est lente
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(cfg.apiUrl.replace(/\/$/, "") + "/translate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: protectedText, direction }),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       if (res.ok) {
         const j = await res.json();
         const final = restore(j.translation || "", tokens);
