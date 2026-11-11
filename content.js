@@ -289,15 +289,27 @@
     return jobs;
   }
 
-  async function resolveTexts(texts) {
-    const need = [...new Set(texts)].filter((t) => !cache.has(t));
+  // Résout et applique les traductions progressivement : chaque batch de 40 est
+  // appliqué dès réception sans attendre les suivants (réactivité immédiate).
+  async function resolveAndApply(jobs) {
+    // Groupe les jobs par texte unique à traduire
+    const jobsByText = new Map();
+    for (const job of jobs) {
+      if (!jobsByText.has(job.text)) jobsByText.set(job.text, []);
+      jobsByText.get(job.text).push(job);
+    }
+    const need = [...jobsByText.keys()].filter((t) => !cache.has(t));
+    // Applique d'abord les textes déjà en cache (dict / appels précédents)
+    if (!active) return;
+    for (const job of jobs) if (cache.has(job.text)) applyJob(job);
     if (!need.length) return;
-    console.debug("[nya-su] resolveTexts: envoi de", need.length, "texte(s) au background");
+    console.debug("[nya-su] resolveAndApply: envoi de", need.length, "texte(s) au background");
     for (let i = 0; i < need.length; i += 40) {
+      if (!active) return;
       const chunk = need.slice(i, i + 40);
       const res = await send({ type: "translate-batch", texts: chunk, direction: "fr-ewo" });
       if (!res || !res.results) {
-        console.warn("[nya-su] translate-batch: pas de réponse ou results absent", res);
+        console.warn("[nya-su] translate-batch: pas de réponse", res);
         continue;
       }
       let ok = 0;
@@ -307,7 +319,12 @@
           if (!res.results[k].untranslated) ok++;
         }
       });
-      console.debug("[nya-su] translate-batch: chunk", i / 40 + 1, "→", ok, "/", chunk.length, "traduit(s)");
+      console.debug("[nya-su] batch", i / 40 + 1, "→", ok, "/", chunk.length, "traduit(s)");
+      // Applique immédiatement ce batch sans attendre les suivants
+      if (!active) return;
+      chunk.forEach((t) => (jobsByText.get(t) || []).forEach(applyJob));
+      observer.takeRecords();
+      if (IS_TOP && ok > 0) showToast(summary());
     }
   }
 
@@ -423,10 +440,7 @@
     const jobs = [];
     for (const root of roots) if (root.isConnected) jobs.push(...collect(root));
     if (!jobs.length) return;
-    await resolveTexts(jobs.map((j) => j.text));
-    if (!active) return;
-    jobs.forEach(applyJob);
-    observer.takeRecords(); // écarte nos propres modifications
+    await resolveAndApply(jobs);
   }
 
   // ---- Surveillance du contenu dynamique
@@ -457,7 +471,7 @@
     } finally {
       running = false;
     }
-    if (IS_TOP && active && stats.dict + stats.machine + stats.none > 0) showToast(summary());
+    // Le toast est maintenant affiché progressivement dans resolveAndApply.
   }
 
   const observer = new MutationObserver((muts) => {
@@ -476,7 +490,7 @@
     observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
     const root = document.body || document.documentElement;
     schedule(root);
-    // Force aussi le traitement immédiat (ne pas attendre le debounce de 120ms)
+    // Flush immédiat sans attendre le debounce
     flush();
   }
 

@@ -5,6 +5,21 @@ import * as localModel from "./localmodel.js";
 const MENU_SELECTION = "nya-su-selection";
 const MENU_PAGE = "nya-su-page";
 
+// --- Warm-up API Railway au démarrage du service worker ---
+// Railway endort les instances inactives (plan gratuit). Un ping /health au
+// démarrage réduit le cold start lors du premier appel de traduction.
+async function warmupApi() {
+  try {
+    const cfg = await getConfig();
+    if (!cfg.apiEnabled || !cfg.apiUrl) return;
+    await fetch(cfg.apiUrl.replace(/\/$/, "") + "/health", { method: "GET" });
+    console.debug("[nya-su] API warm-up OK");
+  } catch (e) {
+    console.debug("[nya-su] API warm-up échoué (normal si hors-ligne) :", e.message);
+  }
+}
+warmupApi();
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({ id: MENU_SELECTION, title: "Traduire la sélection en Ewondo", contexts: ["selection"] });
   chrome.contextMenus.create({ id: MENU_PAGE, title: "Traduire toute la page en Ewondo", contexts: ["page"] });
@@ -92,7 +107,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       }
       case "translate-batch": {
         const texts = (msg.texts || []).slice(0, 100);
-        const results = await mapLimit(texts, 4, (t) => translate(t, msg.direction || "fr-ewo"));
+        // Concurrence à 6 pour des pages avec beaucoup de textes
+        const results = await mapLimit(texts, 6, (t) => translate(t, msg.direction || "fr-ewo"));
         return { results };
       }
       case "frame-ready": {
