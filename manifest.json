@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "nya-su — Traducteur Ewondo",
   "short_name": "nya-su",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Traduit les interfaces financières en Ewondo. Dictionnaire validé, mode hors-ligne optionnel, API de secours.",
   "icons": {
     "16": "icons/icon16.png",
