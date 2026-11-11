@@ -6,13 +6,16 @@
 // Note : on utilise [[TKi]] (ASCII standard) car les crochets mathématiques ⟦...⟧ (U+27E6)
 // sont hors-vocabulaire pour la plupart des tokenizers et provoquaient des boucles infinies de points.
 
-// Montant avec devise : 12 500 F CFA, 12500 FCFA, 1.250,50 XAF, 5000 XAF...
-const AMOUNT_RE = /\d[\d\s .,]*\d?\s?(?:F\s?CFA|FCFA|XAF|XOF|F|CFA|€|EUR|\$|USD)?/gi;
+// Montant avec devise obligatoire : 12 500 F CFA, 12500 FCFA, 1.250,50 XAF, 5000 XAF, 50 €, $100...
+// Note : la devise doit être explicite avec borne \b pour ne pas capturer les années (2024)
+// ni manger la lettre 'f' des mots suivants (ex. « 2024 fait partie » -> ne doit pas manger le 'f').
+const AMOUNT_RE = /\b\d[\d\s .,]*\d?\s*(?:F\s?CFA|FCFA|XAF|XOF|CFA|EUR|USD|€|\$)\b/gi;
 
-// Mot(s) capitalisé(s) en milieu de phrase, précédé(s) d'un mot en minuscule ou d'une ponctuation.
+// Mot(s) capitalisé(s) en milieu de phrase. Désactivé par défaut (names: false) pour ne pas
+// corrompre les noms propres légitimes (pays, nationalités, institutions) sur les pages web.
 const NAME_RE = /(?<=[a-zàâçéèêëîïôûùüÿñæœ,;:]\s)[A-ZÀ-ÝŒ][\p{L}'’-]*(?:\s+[A-ZÀ-ÝŒ][\p{L}'’-]*)*/gu;
 
-export function protect(text, { names = true } = {}) {
+export function protect(text, { names = false } = {}) {
   const tokens = [];
 
   let out = text.replace(AMOUNT_RE, (m) => {
