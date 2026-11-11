@@ -75,7 +75,9 @@ export async function translate(text, direction = "fr-ewo") {
   }
 
   // Garde-fou : texte financier non couvert par le dictionnaire validé -> jamais de traduction automatique.
+  // NOTE : désactivé par défaut (blockMachineOnCritical=false) tant que l'API est un fallback temporaire fr→en.
   if (cfg.blockMachineOnCritical && (amountCount > 0 || CRITICAL_RE.test(original))) {
+    console.debug("[nya-su] blocé (critique) :", original);
     return { text: original, source: "non traduit", untranslated: true, reason: "critique" };
   }
 
@@ -103,9 +105,15 @@ export async function translate(text, direction = "fr-ewo") {
       if (res.ok) {
         const j = await res.json();
         const final = restore(j.translation || "", tokens);
-        if (final && amountsPreserved(original, final)) {
+        // On accepte la traduction si elle est non-vide et différente de l'original.
+        if (final && final !== original && amountsPreserved(original, final)) {
+          console.debug("[nya-su] API ok:", original, "->", final);
           return { text: final, source: "API", machine: true };
         }
+        console.debug("[nya-su] API résultat ignoré (vide ou identique) :", original, "->", final);
+      } else {
+        const body = await res.text().catch(() => "");
+        console.warn("[nya-su] API erreur HTTP", res.status, ":", body);
       }
     } catch (e) {
       console.warn("[nya-su] API indisponible :", e.message);

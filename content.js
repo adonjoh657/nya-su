@@ -291,11 +291,23 @@
 
   async function resolveTexts(texts) {
     const need = [...new Set(texts)].filter((t) => !cache.has(t));
+    if (!need.length) return;
+    console.debug("[nya-su] resolveTexts: envoi de", need.length, "texte(s) au background");
     for (let i = 0; i < need.length; i += 40) {
       const chunk = need.slice(i, i + 40);
       const res = await send({ type: "translate-batch", texts: chunk, direction: "fr-ewo" });
-      if (!res || !res.results) continue;
-      chunk.forEach((t, k) => res.results[k] && cache.set(t, res.results[k]));
+      if (!res || !res.results) {
+        console.warn("[nya-su] translate-batch: pas de réponse ou results absent", res);
+        continue;
+      }
+      let ok = 0;
+      chunk.forEach((t, k) => {
+        if (res.results[k]) {
+          cache.set(t, res.results[k]);
+          if (!res.results[k].untranslated) ok++;
+        }
+      });
+      console.debug("[nya-su] translate-batch: chunk", i / 40 + 1, "→", ok, "/", chunk.length, "traduit(s)");
     }
   }
 
@@ -364,7 +376,13 @@
     const r = cache.get(job.text);
     if (!r) return;
     const key = job.node || job.el;
-    if (r.untranslated || !r.text || r.text === job.text) {
+    if (r.untranslated || !r.text) {
+      if (job.kind !== "attr") noteNone(key);
+      return;
+    }
+    // Si la traduction est identique à l'original (API n'a rien changé), on considère comme non traduit
+    // mais on ne bloque pas — on laisse passer pour les cas où c'est voulu.
+    if (r.text === job.text) {
       if (job.kind !== "attr") noteNone(key);
       return;
     }
@@ -454,8 +472,12 @@
     active = true;
     ensureUI();
     renderFab();
+    console.debug("[nya-su] startPage: démarrage de la traduction de page");
     observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
-    schedule(document.body || document.documentElement);
+    const root = document.body || document.documentElement;
+    schedule(root);
+    // Force aussi le traitement immédiat (ne pas attendre le debounce de 120ms)
+    flush();
   }
 
   function stopPage() {
