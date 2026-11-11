@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nya-su — Options</title>
+  <style>
+    body { font: 15px/1.5 system-ui, sans-serif; max-width: 640px; margin: 24px auto; padding: 0 16px; }
+    label { display: block; margin: 16px 0 4px; font-weight: 600; }
+    input[type=text], input[type=url], select { width: 100%; padding: 8px; font: inherit; }
+    .hint { color: #55606e; font-size: 13px; margin-top: 4px; }
+    button { margin-top: 20px; padding: 8px 16px; font: inherit; }
+    .warn { background: #fff4e0; border: 1px solid #e0a030; padding: 10px; border-radius: 8px; margin-top: 8px; font-size: 13px; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #1b1f25; color: #eef1f5; }
+      .hint { color: #a3adba; }
+      .warn { background: #3a2c10; color: #f3dcae; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Options de nya-su</h1>
+
+  <label><input type="checkbox" id="autoPage"> Traduire automatiquement chaque page</label>
+  <div class="hint">Pratique pour la démonstration. Sinon, utilisez le bouton « Traduire en Ewondo » ou Alt+Maj+T.</div>
+
+  <label><input type="checkbox" id="blockMachineOnCritical"> Pas de traduction automatique pour les textes financiers</label>
+  <div class="hint">Recommandé. Montants, frais, soldes, codes, avertissements : seule une traduction validée du dictionnaire est affichée.</div>
+
+  <label><input type="checkbox" id="apiEnabled"> Autoriser l'API de secours</label>
+  <div class="warn">
+    Si activée, le texte sélectionné (sans les montants, qui restent sur votre appareil) est envoyé à l'API
+    pour traduction. N'utilisez jamais de données bancaires réelles ni de données personnelles.
+  </div>
+
+  <label for="apiUrl">URL de l'API (Railway)</label>
+  <input type="url" id="apiUrl" placeholder="https://nya-su-api.up.railway.app">
+  <div class="hint">Laissez vide pour un fonctionnement 100 % local.</div>
+
+  <label for="modelBaseUrl">URL du modèle hors-ligne</label>
+  <input type="url" id="modelBaseUrl" placeholder="https://…/ewo-model-v1">
+  <div class="hint">Dossier contenant manifest.json, les fichiers .onnx et le tokenizer.</div>
+
+  <button id="save">Enregistrer</button>
+  <span id="saved" class="hint" hidden> Enregistré.</span>
+  <script src="options.js"></script>
+</body>
+</html>

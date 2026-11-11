@@ -1,0 +1,530 @@
+{
+  "meta": {
+    "name": "ewondo-financial-dictionary",
+    "version": "0.1.0",
+    "languages": [
+      "fr",
+      "ewo"
+    ],
+    "domain": "financial_ui",
+    "validated_by": "",
+    "note": "Champs ewo vides : à remplir et valider par un locuteur natif. status = validated pour activer."
+  },
+  "templates": [
+    {
+      "id": "tpl.001",
+      "fr": "Votre solde est {amount}",
+      "ewo": "",
+      "regex": "^Votre solde est (?<amount>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.002",
+      "fr": "Les frais sont de {amount}",
+      "ewo": "",
+      "regex": "^Les frais sont de (?<amount>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.003",
+      "fr": "Frais de transfert : {amount}",
+      "ewo": "",
+      "regex": "^Frais de transfert\\s*:\\s*(?<amount>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.004",
+      "fr": "Total à payer : {amount}",
+      "ewo": "",
+      "regex": "^Total à payer\\s*:\\s*(?<amount>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.005",
+      "fr": "Vous allez envoyer {amount} à {beneficiary}",
+      "ewo": "",
+      "regex": "^Vous allez envoyer (?<amount>.+?) à (?<beneficiary>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.006",
+      "fr": "Transfert de {amount} vers {beneficiary} réussi",
+      "ewo": "",
+      "regex": "^Transfert de (?<amount>.+?) vers (?<beneficiary>.+?) réussi\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.007",
+      "fr": "Vous avez reçu {amount} de {sender}",
+      "ewo": "",
+      "regex": "^Vous avez reçu (?<amount>.+?) de (?<sender>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.008",
+      "fr": "Veuillez confirmer le transfert de {amount}",
+      "ewo": "",
+      "regex": "^Veuillez confirmer le transfert de (?<amount>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.009",
+      "fr": "Solde insuffisant. Votre solde est {amount}",
+      "ewo": "",
+      "regex": "^Solde insuffisant\\. Votre solde est (?<amount>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.010",
+      "fr": "Montant minimum : {amount}",
+      "ewo": "",
+      "regex": "^Montant minimum\\s*:\\s*(?<amount>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.011",
+      "fr": "Montant maximum : {amount}",
+      "ewo": "",
+      "regex": "^Montant maximum\\s*:\\s*(?<amount>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.012",
+      "fr": "Entrez le code envoyé au {phone}",
+      "ewo": "",
+      "regex": "^Entrez le code envoyé au (?<phone>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "tpl.013",
+      "fr": "Votre remboursement de {amount} est dû le {date}",
+      "ewo": "",
+      "regex": "^Votre remboursement de (?<amount>.+?) est dû le (?<date>.+?)\\.?$",
+      "critical": true,
+      "status": "a_valider"
+    }
+  ],
+  "terms": [
+    {
+      "id": "t.001",
+      "fr": "solde",
+      "ewo": "",
+      "domain": "account",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.002",
+      "fr": "votre solde",
+      "ewo": "",
+      "domain": "account",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.003",
+      "fr": "compte",
+      "ewo": "",
+      "domain": "account",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.004",
+      "fr": "numéro de compte",
+      "ewo": "",
+      "domain": "account",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.005",
+      "fr": "transfert",
+      "ewo": "",
+      "domain": "transfer",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.006",
+      "fr": "envoyer de l'argent",
+      "ewo": "",
+      "domain": "transfer",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.007",
+      "fr": "recevoir de l'argent",
+      "ewo": "",
+      "domain": "transfer",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.008",
+      "fr": "bénéficiaire",
+      "ewo": "",
+      "domain": "transfer",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.009",
+      "fr": "montant",
+      "ewo": "",
+      "domain": "transfer",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.010",
+      "fr": "frais",
+      "ewo": "",
+      "domain": "fees",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.011",
+      "fr": "frais de transfert",
+      "ewo": "",
+      "domain": "fees",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.012",
+      "fr": "total à payer",
+      "ewo": "",
+      "domain": "fees",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.013",
+      "fr": "confirmer",
+      "ewo": "",
+      "domain": "action",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.014",
+      "fr": "annuler",
+      "ewo": "",
+      "domain": "action",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.015",
+      "fr": "valider",
+      "ewo": "",
+      "domain": "action",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.016",
+      "fr": "continuer",
+      "ewo": "",
+      "domain": "action",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.017",
+      "fr": "retour",
+      "ewo": "",
+      "domain": "action",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.018",
+      "fr": "code PIN",
+      "ewo": "",
+      "domain": "security",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.019",
+      "fr": "mot de passe",
+      "ewo": "",
+      "domain": "security",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.020",
+      "fr": "code de confirmation",
+      "ewo": "",
+      "domain": "security",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.021",
+      "fr": "ne partagez jamais votre code PIN",
+      "ewo": "",
+      "domain": "security",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.022",
+      "fr": "opération réussie",
+      "ewo": "",
+      "domain": "status",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.023",
+      "fr": "opération échouée",
+      "ewo": "",
+      "domain": "status",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.024",
+      "fr": "solde insuffisant",
+      "ewo": "",
+      "domain": "error",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.025",
+      "fr": "montant invalide",
+      "ewo": "",
+      "domain": "error",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.026",
+      "fr": "numéro invalide",
+      "ewo": "",
+      "domain": "error",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.027",
+      "fr": "erreur de connexion",
+      "ewo": "",
+      "domain": "error",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.028",
+      "fr": "réessayez plus tard",
+      "ewo": "",
+      "domain": "error",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.029",
+      "fr": "transaction en cours",
+      "ewo": "",
+      "domain": "status",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.030",
+      "fr": "historique des transactions",
+      "ewo": "",
+      "domain": "account",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.031",
+      "fr": "dépôt",
+      "ewo": "",
+      "domain": "account",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.032",
+      "fr": "retrait",
+      "ewo": "",
+      "domain": "account",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.033",
+      "fr": "paiement",
+      "ewo": "",
+      "domain": "payment",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.034",
+      "fr": "payer une facture",
+      "ewo": "",
+      "domain": "payment",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.035",
+      "fr": "recharge",
+      "ewo": "",
+      "domain": "payment",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.036",
+      "fr": "crédit",
+      "ewo": "",
+      "domain": "account",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.037",
+      "fr": "épargne",
+      "ewo": "",
+      "domain": "account",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.038",
+      "fr": "prêt",
+      "ewo": "",
+      "domain": "loan",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.039",
+      "fr": "remboursement",
+      "ewo": "",
+      "domain": "loan",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.040",
+      "fr": "taux d'intérêt",
+      "ewo": "",
+      "domain": "loan",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.041",
+      "fr": "date d'échéance",
+      "ewo": "",
+      "domain": "loan",
+      "critical": true,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.042",
+      "fr": "agent",
+      "ewo": "",
+      "domain": "service",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.043",
+      "fr": "agence",
+      "ewo": "",
+      "domain": "service",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.044",
+      "fr": "service client",
+      "ewo": "",
+      "domain": "service",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.045",
+      "fr": "aide",
+      "ewo": "",
+      "domain": "service",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.046",
+      "fr": "bonjour",
+      "ewo": "",
+      "domain": "general",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.047",
+      "fr": "merci",
+      "ewo": "",
+      "domain": "general",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.048",
+      "fr": "oui",
+      "ewo": "",
+      "domain": "general",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.049",
+      "fr": "non",
+      "ewo": "",
+      "domain": "general",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.050",
+      "fr": "récapitulatif",
+      "ewo": "",
+      "domain": "transfer",
+      "critical": false,
+      "status": "a_valider"
+    },
+    {
+      "id": "t.051",
+      "fr": "vérifiez les informations avant de confirmer",
+      "ewo": "",
+      "domain": "transfer",
+      "critical": true,
+      "status": "a_valider"
+    }
+  ],
+  "fallbacks": []
+}
