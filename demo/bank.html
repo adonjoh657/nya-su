@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DémoPay — Simulation (aucune donnée réelle)</title>
+  <style>
+    :root { --bg:#f4f6f9; --card:#fff; --fg:#1a1a1a; --muted:#5a6573; --line:#d9dee5; --accent:#0b5cad; --ok:#1b7a3d; --bad:#b3261e; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui,sans-serif; }
+    header { background:var(--accent); color:#fff; padding:14px 20px; display:flex; justify-content:space-between; align-items:center; }
+    header .sim { font-size:12px; background:rgba(255,255,255,.2); padding:3px 10px; border-radius:999px; }
+    main { max-width:560px; margin:20px auto; padding:0 14px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; margin-bottom:16px; }
+    h2 { margin:0 0 10px; font-size:18px; }
+    label { display:block; margin:12px 0 4px; font-weight:600; font-size:14px; }
+    input { width:100%; padding:10px; font:inherit; border:1px solid var(--line); border-radius:8px; }
+    button { margin-top:14px; padding:10px 16px; font:inherit; border:0; border-radius:8px; background:var(--accent); color:#fff; cursor:pointer; }
+    button.secondary { background:#e8ecf1; color:var(--fg); margin-left:8px; }
+    .balance { font-size:26px; font-weight:700; }
+    .notice { font-size:14px; color:var(--muted); }
+    .warning { background:#fff4e0; border:1px solid #e0a030; border-radius:8px; padding:10px; font-size:14px; margin-top:12px; }
+    .error { color:var(--bad); font-weight:600; margin-top:10px; }
+    .success { color:var(--ok); font-weight:600; margin-top:10px; }
+    dl { margin:0; } dt { color:var(--muted); font-size:13px; margin-top:8px; } dd { margin:0; font-weight:600; }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+  <header><strong>DémoPay</strong><span class="sim">Simulation — données fictives</span></header>
+  <main>
+
+    <section class="card" id="home">
+      <h2>Compte principal</h2>
+      <p>Votre solde est <span class="balance">12 500 F CFA</span></p>
+      <p class="notice">Historique des transactions : aucune opération récente.</p>
+      <button id="goTransfer">Envoyer de l'argent</button>
+    </section>
+
+    <section class="card" id="form" hidden>
+      <h2>Transfert</h2>
+      <label for="ben">Bénéficiaire</label>
+      <input id="ben" value="Marie Ndzana">
+      <label for="amt">Montant (F CFA)</label>
+      <input id="amt" inputmode="numeric" value="5000">
+      <p class="notice">Montant minimum : 100 F CFA</p>
+      <p class="notice">Montant maximum : 500 000 F CFA</p>
+      <button id="preview">Continuer</button>
+      <button class="secondary" id="back1">Annuler</button>
+      <div id="formError" class="error" hidden></div>
+    </section>
+
+    <section class="card" id="recap" hidden>
+      <h2>Récapitulatif</h2>
+      <dl>
+        <dt>Bénéficiaire</dt><dd id="rBen"></dd>
+        <dt>Montant</dt><dd id="rAmt"></dd>
+        <dt>Frais de transfert : <span id="rFee"></span></dt>
+        <dt>Total à payer : <span id="rTot"></span></dt>
+      </dl>
+      <div class="warning">Vérifiez les informations avant de confirmer. Ne partagez jamais votre code PIN.</div>
+      <button id="confirm">Confirmer</button>
+      <button class="secondary" id="back2">Annuler</button>
+    </section>
+
+    <section class="card" id="done" hidden>
+      <h2>Résultat</h2>
+      <p class="success" id="doneMsg"></p>
+      <p>Votre solde est <strong id="newBal"></strong></p>
+      <button id="again">Retour</button>
+    </section>
+
+    <section class="card">
+      <h2>Démo : message inédit</h2>
+      <p class="notice">Simule un nouveau message introduit par le jury pendant la démonstration.</p>
+      <label for="newMsg">Message</label>
+      <input id="newMsg" value="Votre transfert sera traité sous 24 heures.">
+      <button id="inject">Afficher le message</button>
+      <div id="injected" class="warning" hidden></div>
+    </section>
+
+  </main>
+
+  <script>
+    document.getElementById("inject").onclick = function () {
+      var box = document.getElementById("injected");
+      box.textContent = document.getElementById("newMsg").value;
+      box.hidden = false;
+    };
+    const fmt = (n) => n.toLocaleString("fr-FR").replace(/ /g, " ") + " F CFA";
+    let balance = 12500;
+    const $ = (id) => document.getElementById(id);
+    const show = (id) => ["home","form","recap","done"].forEach(s => $(s).hidden = s !== id);
+    const fee = (a) => Math.max(50, Math.round(a * 0.01));
+
+    $("goTransfer").onclick = () => show("form");
+    $("back1").onclick = $("back2").onclick = () => show("home");
+    $("again").onclick = () => { $("home").querySelector(".balance").textContent = fmt(balance); show("home"); };
+
+    $("preview").onclick = () => {
+      const a = parseInt($("amt").value.replace(/\D/g, ""), 10);
+      const err = $("formError"); err.hidden = true;
+      if (!a || a < 100) { err.textContent = "Montant invalide"; err.hidden = false; return; }
+      if (a + fee(a) > balance) { err.textContent = "Solde insuffisant. Votre solde est " + fmt(balance); err.hidden = false; return; }
+      $("rBen").textContent = $("ben").value;
+      $("rAmt").textContent = fmt(a);
+      $("rFee").textContent = fmt(fee(a));
+      $("rTot").textContent = fmt(a + fee(a));
+      show("recap");
+    };
+
+    $("confirm").onclick = () => {
+      const a = parseInt($("amt").value.replace(/\D/g, ""), 10);
+      balance -= a + fee(a);
+      $("doneMsg").textContent = "Transfert de " + fmt(a) + " vers " + $("ben").value + " réussi";
+      $("newBal").textContent = fmt(balance);
+      show("done");
+    };
+  </script>
+</body>
+</html>

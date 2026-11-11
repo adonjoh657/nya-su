@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>nya-su</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <h1>nya-su</h1>
+    <span id="status" class="badge">…</span>
+  </header>
+
+  <section>
+    <button id="togglePage" class="primary">Traduire la page en Ewondo</button>
+    <p id="pageHint" class="hint">Raccourci : Alt+Maj+T</p>
+    <ul class="legend" aria-label="Légende">
+      <li><span class="sym ok">✓</span> Dictionnaire validé</li>
+      <li><span class="sym warn">⚠</span> Automatique, à vérifier (souligné)</li>
+      <li><span class="sym bad">✕</span> Non traduit (texte d'origine)</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Saisie libre</h2>
+    <div class="row">
+      <select id="direction" aria-label="Sens de traduction">
+        <option value="fr-ewo">Français → Ewondo</option>
+        <option value="ewo-fr">Ewondo → Français</option>
+      </select>
+    </div>
+    <textarea id="input" rows="4" placeholder="Saisissez un texte…" aria-label="Texte à traduire"></textarea>
+    <button id="translate" class="primary">Traduire</button>
+
+    <div id="result" class="result" hidden>
+      <div id="resultText" class="result-text"></div>
+      <div id="resultMeta" class="result-meta"></div>
+      <button id="copy">Copier le résultat</button>
+    </div>
+  </section>
+
+  <section id="offline">
+    <h2>Mode hors-ligne</h2>
+    <p id="offlineInfo" class="hint"></p>
+    <button id="install">Installer le mode hors-ligne</button>
+    <progress id="progress" max="100" value="0" hidden></progress>
+    <p id="offlineMsg" class="hint"></p>
+  </section>
+
+  <section>
+    <div class="row between">
+      <h2>Historique</h2>
+      <button id="clearHistory" class="link">Effacer</button>
+    </div>
+    <ul id="history"></ul>
+  </section>
+
+  <footer><a href="#" id="openOptions">Options</a></footer>
+  <script src="popup.js"></script>
+</body>
+</html>
