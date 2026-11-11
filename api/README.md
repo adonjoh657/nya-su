@@ -9,6 +9,7 @@ côté extension et ne transitent pas par l'API.
 ```
 api/
 ├─ app.py            # FastAPI (chargement paresseux du modèle)
+├─ main.py           # point d'entrée `uvicorn main:app` (Railpack)
 ├─ requirements.txt  # torch CPU + transformers
 ├─ railway.json      # config Railway (Nixpacks, healthcheck /health)
 ├─ .python-version   # 3.11
